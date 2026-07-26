@@ -1,15 +1,32 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 export function HeroSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+
   return (
-    <section className="relative overflow-hidden border-b bg-gradient-to-b from-primary/10 via-background to-background">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-24 text-center md:py-32">
+    <section
+      ref={sectionRef}
+      className="relative h-[100vh] min-h-[640px] overflow-hidden border-b bg-gradient-to-b from-primary/10 via-background to-background"
+    >
+      <motion.div
+        style={{ y: contentY, opacity: contentOpacity, scale }}
+        className="mx-auto flex h-full max-w-6xl flex-col items-center justify-center gap-6 px-4 text-center"
+      >
         <motion.span
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -51,7 +68,15 @@ export function HeroSection() {
             Kapcsolatfelvétel
           </Button>
         </motion.div>
-      </div>
+      </motion.div>
+
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground"
+      >
+        <ChevronDown className="size-6" />
+      </motion.div>
     </section>
   );
 }
