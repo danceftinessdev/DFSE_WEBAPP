@@ -44,10 +44,10 @@ export function HeroSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col gap-3 sm:flex-row"
         >
-          <Button size="lg" render={<Link href="/orarend" />}>
+          <Button size="lg" nativeButton={false} render={<Link href="/orarend" />}>
             Órarend megtekintése <ArrowRight className="ml-2 size-4" />
           </Button>
-          <Button size="lg" variant="outline" render={<Link href="/kapcsolat" />}>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/kapcsolat" />}>
             Kapcsolatfelvétel
           </Button>
         </motion.div>

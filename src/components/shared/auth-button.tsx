@@ -31,7 +31,7 @@ export function AuthButton({ isLoggedIn, isStaff, displayName }: AuthButtonProps
 
   if (!isLoggedIn) {
     return (
-      <Button size="sm" render={<Link href="/login" />}>
+      <Button size="sm" nativeButton={false} render={<Link href="/login" />}>
         Bejelentkezés
       </Button>
     );
