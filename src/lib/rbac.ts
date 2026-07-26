@@ -1,7 +1,9 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import type { AppRole } from "@/types/database.types";
+import type { Database } from "@/types/database.types";
+
+export type AppRole = Database["public"]["Enums"]["app_role"];
 
 /**
  * Bejelentkezett felhasználó profilja + role-jai, Server Component-ekben
