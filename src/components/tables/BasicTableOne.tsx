@@ -10,8 +10,8 @@ import {
 import Badge from "../ui/badge/Badge";
 import Image from "next/image";
 
-interface Order {
-  id: number;
+export interface MemberRow {
+  id: string | number;
   user: {
     image: string;
     name: string;
@@ -25,8 +25,8 @@ interface Order {
   budget: string;
 }
 
-// Define the table data using the interface
-const tableData: Order[] = [
+// Default fallback data using the interface
+export const defaultTableData: MemberRow[] = [
   {
     id: 1,
     user: {
@@ -107,7 +107,13 @@ const tableData: Order[] = [
   },
 ];
 
-export default function BasicTableOne() {
+export default function BasicTableOne({
+  data = defaultTableData,
+}: {
+  data?: MemberRow[];
+}) {
+  const rows = data && data.length > 0 ? data : defaultTableData;
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
@@ -151,7 +157,7 @@ export default function BasicTableOne() {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {tableData.map((order) => (
+              {rows.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <div className="flex items-center gap-3">
