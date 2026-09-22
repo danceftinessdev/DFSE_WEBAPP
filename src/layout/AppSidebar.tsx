@@ -84,6 +84,12 @@ const navItems: NavItem[] = [
     permission: "news.manage",
   },
   {
+    icon: <DocsIcon />,
+    name: "Felugró üzenetek",
+    path: "/admin/uzenetek",
+    permission: "announcements.manage",
+  },
+  {
     icon: <ListIcon />,
     name: "Naptár (események)",
     path: "/admin/calendar",

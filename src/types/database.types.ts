@@ -1366,6 +1366,51 @@ export type Database = {
           },
         ]
       }
+      announcements: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_mode: "login" | "all_pages" | "selected_pages"
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          message: string
+          pages: string[]
+          starts_at: string | null
+          target_profile_ids: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_mode?: "login" | "all_pages" | "selected_pages"
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          message: string
+          pages?: string[]
+          starts_at?: string | null
+          target_profile_ids?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_mode?: "login" | "all_pages" | "selected_pages"
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          message?: string
+          pages?: string[]
+          starts_at?: string | null
+          target_profile_ids?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           code: string

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "db:push": "supabase db push",
+    "db:push": "npx supabase db push",
     "db:pull": "supabase db pull",
     "db:types": "supabase gen types typescript --linked"
   },
