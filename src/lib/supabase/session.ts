@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { ExtendedDatabase } from "@/types/database.coach.types";
+import { permissionForPath } from "@/lib/permissions";
 
 const PROTECTED_PREFIX = "/admin";
 
@@ -9,11 +10,26 @@ const PROTECTED_PREFIX = "/admin";
  * unauthenticated visitors away from /admin. Called from src/proxy.ts.
  */
 export async function updateSession(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (pathname.startsWith(PROTECTED_PREFIX)) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/signin";
+      url.searchParams.set("redirectedFrom", pathname);
+      return NextResponse.redirect(url);
+    }
+
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient<ExtendedDatabase>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -38,13 +54,30 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-
   if (pathname.startsWith(PROTECTED_PREFIX) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/signin";
     url.searchParams.set("redirectedFrom", pathname);
     return NextResponse.redirect(url);
+  }
+
+  if (user && pathname.startsWith(PROTECTED_PREFIX)) {
+    const requiredPermission = permissionForPath(pathname);
+    if (requiredPermission) {
+      const adminResult = await supabase.rpc("is_admin");
+      const roleResult = !adminResult.data
+        ? await supabase.rpc("has_role", { _role: "admin" })
+        : { data: true, error: null };
+      const permissionResult = adminResult.data || roleResult.data
+        ? { data: true, error: null }
+        : await supabase.rpc("has_permission", { _code: requiredPermission });
+      if (permissionResult.error || !permissionResult.data) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin/hozzaferes-megtagadva";
+        url.searchParams.set("from", pathname);
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   return supabaseResponse;

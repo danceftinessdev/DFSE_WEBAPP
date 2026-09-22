@@ -1,5 +1,6 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { createClient } from "@/lib/supabase/server";
+import { hasPermission } from "@/lib/supabase/guards";
 import { notFound } from "next/navigation";
 import React from "react";
 import MemberDetail, {
@@ -19,6 +20,8 @@ interface Props {
 export default async function MemberDetailPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
+  const canViewPayments = await hasPermission(supabase, "payments.view");
+  const canManageMembers = await hasPermission(supabase, "members.manage");
 
   const { data: member } = await supabase.from("members").select("*").eq("id", id).maybeSingle();
   if (!member) notFound();
@@ -34,15 +37,19 @@ export default async function MemberDetailPage({ params }: Props) {
         .from("enrollments")
         .select("id, group_id, status, fee_status, groups ( name )")
         .eq("member_id", id),
-      supabase
+      canViewPayments
+        ? supabase
         .from("member_payments")
         .select("*")
         .eq("member_id", id)
-        .order("due_date", { ascending: false }),
-      supabase
+        .order("due_date", { ascending: false })
+        : Promise.resolve({ data: [] as never[] }),
+      canViewPayments
+        ? supabase
         .from("competition_payments")
         .select("*, competitions ( id, name, starts_at )")
-        .eq("member_id", id),
+        .eq("member_id", id)
+        : Promise.resolve({ data: [] as never[] }),
       supabase
         .from("class_attendance")
         .select("id, session_date, status, training_classes ( name )")
@@ -114,6 +121,8 @@ export default async function MemberDetailPage({ params }: Props) {
         attendance={attendance}
         choreographies={choreos}
         competitions={competitions}
+        canViewPayments={canViewPayments}
+        canManageMembers={canManageMembers}
       />
     </div>
   );

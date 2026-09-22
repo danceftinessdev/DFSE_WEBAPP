@@ -45,7 +45,7 @@ function revalidateCompetitions(id?: string) {
 }
 
 export async function createCompetition(input: CompetitionInput): Promise<ActionResult<{ id: string }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateCompetition(input);
   if (validationError) return fail(validationError);
@@ -64,7 +64,7 @@ export async function createCompetition(input: CompetitionInput): Promise<Action
 }
 
 export async function updateCompetition(id: string, input: CompetitionInput): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateCompetition(input);
   if (validationError) return fail(validationError);
@@ -82,7 +82,7 @@ export async function updateCompetition(id: string, input: CompetitionInput): Pr
 }
 
 export async function deleteCompetition(id: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -112,7 +112,7 @@ export async function saveTravelInfo(
   competitionId: string,
   input: { departure_location?: string | null; departure_time?: string | null }
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const payload = {
@@ -140,7 +140,7 @@ export async function saveAccommodation(
     check_out_time?: string | null;
   }
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const payload = {
@@ -198,7 +198,7 @@ export async function saveEntry(
   input: EntryInput,
   entryId?: string
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateEntry(input);
   if (validationError) return fail(validationError);
@@ -284,7 +284,7 @@ export async function saveEntry(
 }
 
 export async function deleteEntry(entryId: string, competitionId: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -320,7 +320,7 @@ export async function upsertCompetitionPayment(
   memberId: string,
   input: CompetitionPaymentInput
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (input.entry_fee_amount < 0 || input.travel_fee_amount < 0)
     return fail("Az összegek nem lehetnek negatívak.");
@@ -351,7 +351,7 @@ export async function deleteCompetitionPayment(
   competitionId: string,
   memberId: string
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { error: deleteError } = await supabase
@@ -386,7 +386,7 @@ export async function saveVehicle(
   input: VehicleInput,
   vehicleId?: string
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (!VEHICLE_TYPES.includes(input.type)) return fail("Érvénytelen járműtípus.");
   if (!Number.isFinite(input.capacity) || input.capacity < 1) return fail("A kapacitás legalább 1 legyen.");
@@ -424,7 +424,7 @@ export async function saveVehicle(
 }
 
 export async function deleteVehicle(vehicleId: string, competitionId: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("competitions.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase

@@ -51,7 +51,7 @@ export async function createMember(
   input: MemberInput,
   groupIds: string[]
 ): Promise<ActionResult<{ id: string }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("members.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (!input.full_name?.trim()) return fail("A tag neve kötelező.");
 
@@ -82,7 +82,7 @@ export async function createMember(
 }
 
 export async function updateMember(id: string, input: MemberInput): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("members.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (!input.full_name?.trim()) return fail("A tag neve kötelező.");
 
@@ -99,7 +99,7 @@ export async function updateMember(id: string, input: MemberInput): Promise<Acti
 }
 
 export async function deleteMember(id: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("members.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -119,7 +119,7 @@ export async function deleteMember(id: string): Promise<ActionResult> {
 
 /** Csoportbeosztások teljes felülírása (diff alapú törlés/beszúrás). */
 export async function setMemberGroups(memberId: string, groupIds: string[]): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("members.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: current } = await supabase
@@ -170,7 +170,7 @@ function validatePayment(input: PaymentInput): string | null {
 }
 
 export async function addMemberPayment(memberId: string, input: PaymentInput): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validatePayment(input);
   if (validationError) return fail(validationError);
@@ -195,7 +195,7 @@ export async function addMemberPayment(memberId: string, input: PaymentInput): P
 }
 
 export async function setPaymentPaid(paymentId: string, paid: boolean): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -226,7 +226,7 @@ export async function setPaymentPaid(paymentId: string, paid: boolean): Promise<
 }
 
 export async function deleteMemberPayment(paymentId: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -249,7 +249,7 @@ export async function bulkCreatePayments(
   memberIds: string[],
   input: PaymentInput
 ): Promise<ActionResult<{ count: number }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("payments.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (memberIds.length === 0) return fail("Jelölj ki legalább egy tagot.");
   const validationError = validatePayment(input);

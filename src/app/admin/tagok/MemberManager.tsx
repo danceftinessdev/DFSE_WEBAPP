@@ -45,6 +45,8 @@ interface MemberManagerProps {
   members: MemberListItem[];
   groups: { id: string; name: string }[];
   exportRows: PaymentExportRow[];
+  canViewPayments: boolean;
+  canManagePayments: boolean;
 }
 
 const statusBadge = (status: string) => {
@@ -88,7 +90,7 @@ function exportCsv(rows: PaymentExportRow[]) {
   URL.revokeObjectURL(url);
 }
 
-export default function MemberManager({ members, groups, exportRows }: MemberManagerProps) {
+export default function MemberManager({ members, groups, exportRows, canViewPayments, canManagePayments }: MemberManagerProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -218,7 +220,7 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
             </select>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button
+            {canManagePayments && <Button
               variant="outline"
               size="sm"
               onClick={() => {
@@ -227,16 +229,18 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
               }}
             >
               {selectionMode ? "Kijelölés vége" : "Tömeges kijelölés"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              startIcon={<DownloadIcon className="h-4 w-4" />}
-              onClick={() => exportCsv(exportRows)}
-              disabled={exportRows.length === 0}
-            >
-              Exportálás
-            </Button>
+            </Button>}
+            {canViewPayments && (
+              <Button
+                variant="outline"
+                size="sm"
+                startIcon={<DownloadIcon className="h-4 w-4" />}
+                onClick={() => exportCsv(exportRows)}
+                disabled={exportRows.length === 0}
+              >
+                Pénzügyi export
+              </Button>
+            )}
             <Link href="/admin/tagok/uj">
               <Button size="sm" startIcon={<PlusIcon className="h-4 w-4" />}>
                 Új tag
@@ -246,7 +250,7 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
         </div>
 
         {/* Tömeges műveletek sáv */}
-        {selectionMode && (
+        {selectionMode && canManagePayments && (
           <div className="flex flex-wrap items-center gap-3 border-b border-gray-100 bg-gray-50 px-5 py-3 dark:border-gray-800 dark:bg-white/[0.02]">
             <span className="text-sm text-gray-600 dark:text-gray-400">
               {selected.size} tag kijelölve
@@ -285,9 +289,7 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
                 <TableCell isHeader className="px-5 py-3 text-start text-sm font-medium text-gray-500 dark:text-gray-400">
                   Engedélyek
                 </TableCell>
-                <TableCell isHeader className="px-5 py-3 text-start text-sm font-medium text-gray-500 dark:text-gray-400">
-                  Tartozás
-                </TableCell>
+                {canViewPayments && <TableCell isHeader className="px-5 py-3 text-start text-sm font-medium text-gray-500 dark:text-gray-400">Tartozás</TableCell>}
                 <TableCell isHeader className="px-5 py-3 text-end text-sm font-medium text-gray-500 dark:text-gray-400">
                   Műveletek
                 </TableCell>
@@ -296,7 +298,7 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell className="px-5 py-10 text-center text-sm text-gray-500" colSpan={selectionMode ? 7 : 6}>
+                    <TableCell className="px-5 py-10 text-center text-sm text-gray-500" colSpan={(selectionMode ? 1 : 0) + (canViewPayments ? 6 : 5)}>
                     Nincs a szűrésnek megfelelő tag.
                   </TableCell>
                 </TableRow>
@@ -327,17 +329,9 @@ export default function MemberManager({ members, groups, exportRows }: MemberMan
                       <ExpiryBadge date={m.medical_expiry} label="Sportorvosi" />
                     </div>
                   </TableCell>
-                  <TableCell className="px-5 py-4">
-                    {m.debtCount > 0 ? (
-                      <Badge variant="light" color="error" size="sm">
-                        {m.debtCount} tartozás
-                      </Badge>
-                    ) : (
-                      <Badge variant="light" color="success" size="sm">
-                        Rendezett
-                      </Badge>
-                    )}
-                  </TableCell>
+                  {canViewPayments && <TableCell className="px-5 py-4">
+                    {m.debtCount > 0 ? <Badge variant="light" color="error" size="sm">{m.debtCount} tartozás</Badge> : <Badge variant="light" color="success" size="sm">Rendezett</Badge>}
+                  </TableCell>}
                   <TableCell className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
                       <Link

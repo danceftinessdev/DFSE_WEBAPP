@@ -43,7 +43,7 @@ function revalidateChoreos(id?: string) {
 }
 
 export async function createChoreography(input: ChoreographyInput): Promise<ActionResult<{ id: string }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("choreographies.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateChoreography(input);
   if (validationError) return fail(validationError);
@@ -69,7 +69,7 @@ export async function saveChoreography(
   dancerIds: string[],
   elements: EntryElement[]
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("choreographies.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateChoreography(input);
   if (validationError) return fail(validationError);
@@ -144,7 +144,7 @@ export async function saveChoreography(
 }
 
 export async function deleteChoreography(id: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("choreographies.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase

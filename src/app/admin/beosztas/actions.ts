@@ -98,7 +98,7 @@ export async function createClass(
   input: ClassInput,
   memberIds: string[]
 ): Promise<ActionResult<{ id: string }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("schedule.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateClass(input);
   if (validationError) return fail(validationError);
@@ -124,7 +124,7 @@ export async function updateClass(
   input: ClassInput,
   memberIds: string[]
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("schedule.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateClass(input);
   if (validationError) return fail(validationError);
@@ -149,7 +149,7 @@ export async function updateClass(
 }
 
 export async function deleteClass(id: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("schedule.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase
@@ -177,7 +177,7 @@ export async function saveSession(
   sessionDate: string,
   input: SessionInput
 ): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("schedule.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   if (!sessionDate) return fail("A dátum kötelező.");
 

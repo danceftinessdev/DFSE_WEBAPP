@@ -63,6 +63,8 @@ interface MemberDetailProps {
   attendance: MemberAttendanceItem[];
   choreographies: MemberChoreoItem[];
   competitions: MemberCompetitionItem[];
+  canViewPayments: boolean;
+  canManageMembers: boolean;
 }
 
 const TABS = [
@@ -84,6 +86,8 @@ export default function MemberDetail({
   attendance,
   choreographies,
   competitions,
+  canViewPayments,
+  canManageMembers,
 }: MemberDetailProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -192,17 +196,13 @@ export default function MemberDetail({
             >
               {member.status === "active" ? "Aktív" : member.status === "pending" ? "Függőben" : "Inaktív"}
             </Badge>
-            <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}>
-              <span className="flex items-center gap-2 text-error-500">
-                <TrashBinIcon className="h-4 w-4" /> Törlés
-              </span>
-            </Button>
+            {canManageMembers && <Button variant="outline" size="sm" onClick={() => setDeleteOpen(true)}><span className="flex items-center gap-2 text-error-500"><TrashBinIcon className="h-4 w-4" /> Törlés</span></Button>}
           </div>
         </div>
 
         {/* Tabok */}
         <div className="mt-5 flex flex-wrap gap-2 border-t border-gray-100 pt-4 dark:border-gray-800">
-          {TABS.map((tab) => (
+          {TABS.filter((tab) => tab.id !== "befizetesek" || canViewPayments).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -221,7 +221,7 @@ export default function MemberDetail({
       {/* Adatok */}
       {activeTab === "adatok" && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-          <MemberForm value={form} onChange={setForm} disabled={isPending} />
+          <MemberForm value={form} onChange={setForm} disabled={isPending || !canManageMembers} />
           {groups.length > 0 && (
             <div className="mt-4">
               <Label>Csoportbeosztás</Label>
@@ -231,7 +231,7 @@ export default function MemberDetail({
                     key={g.id}
                     label={g.name}
                     checked={groupIds.has(g.id)}
-                    disabled={isPending}
+                    disabled={isPending || !canManageMembers}
                     onChange={() =>
                       setGroupIds((prev) => {
                         const next = new Set(prev);
@@ -246,15 +246,15 @@ export default function MemberDetail({
             </div>
           )}
           <div className="mt-6 flex justify-end">
-            <Button size="sm" onClick={handleSaveProfile} disabled={isPending}>
+            {canManageMembers && <Button size="sm" onClick={handleSaveProfile} disabled={isPending}>
               {isPending ? "Mentés…" : "Mentés"}
-            </Button>
+            </Button>}
           </div>
         </div>
       )}
 
       {/* Befizetések */}
-      {activeTab === "befizetesek" && (
+      {activeTab === "befizetesek" && canViewPayments && (
         <div className="space-y-6">
           <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
             <h4 className="mb-4 font-medium text-gray-800 dark:text-white/90">Új befizetés kiírása</h4>

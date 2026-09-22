@@ -1,4 +1,5 @@
 import { createClient } from "./server";
+import type { PermissionCode } from "@/lib/permissions";
 
 export type ActionResult<T = undefined> =
   | ({ success: true } & (T extends undefined ? object : { data: T }))
@@ -12,6 +13,26 @@ export function fail<T = undefined>(error: string): ActionResult<T> {
   return { success: false, error };
 }
 
+export async function hasPermission(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  code: PermissionCode
+) {
+  const adminResult = await supabase.rpc("is_admin");
+  if (!adminResult.error && adminResult.data) return true;
+  const permissionResult = await supabase.rpc("has_permission", { _code: code });
+  return !permissionResult.error && permissionResult.data === true;
+}
+
+export async function requirePermission(code: PermissionCode) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { supabase, user: null, error: "Bejelentkezés szükséges." as string | null };
+  if (await hasPermission(supabase, code)) return { supabase, user, error: null as string | null };
+  return { supabase, user, error: "Nincs jogosultságod ehhez a felülethez." as string | null };
+}
+
 /**
  * Hitelesítés + edző/admin jogosultság ellenőrzése server action-ökhöz.
  *
@@ -19,7 +40,7 @@ export function fail<T = undefined>(error: string): ActionResult<T> {
  * Ha a szerepkör-függvények (is_admin / has_role) nem érhetők el az adatbázisban,
  * fejlesztési kompromisszumként minden hitelesített felhasználót beenged.
  */
-export async function requireStaff() {
+export async function requireStaff(permission?: PermissionCode) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,6 +48,10 @@ export async function requireStaff() {
 
   if (!user) {
     return { supabase, user: null, error: "Bejelentkezés szükséges." as string | null };
+  }
+
+  if (permission && !(await hasPermission(supabase, permission))) {
+    return { supabase, user, error: "Nincs jogosultságod ehhez a művelethez." as string | null };
   }
 
   try {
@@ -61,4 +86,30 @@ export async function requireStaff() {
   } catch {
     return { supabase, user, error: null as string | null };
   }
+}
+
+/** Jogosultságok és szerepkörök módosításához kizárólag admin engedélyezett. */
+export async function requireAdmin() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { supabase, user: null, error: "Bejelentkezés szükséges." as string | null };
+
+  const adminResult = await supabase.rpc("is_admin");
+  if (!adminResult.error && adminResult.data) {
+    return { supabase, user, error: null as string | null };
+  }
+
+  const roleResult = await supabase.rpc("has_role", { _role: "admin" });
+  if (!roleResult.error && roleResult.data) {
+    return { supabase, user, error: null as string | null };
+  }
+
+  return {
+    supabase,
+    user,
+    error: "Csak admin kezelheti a jogosultságokat." as string | null,
+  };
 }

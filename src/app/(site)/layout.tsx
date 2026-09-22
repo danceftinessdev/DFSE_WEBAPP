@@ -89,14 +89,14 @@ export default function SiteLayout({
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
+                  className="flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5"
                 >
                   {link.name}
                 </Link>
               ))}
               <Link
                 href="/signin"
-                className="mt-1 rounded-lg bg-brand-500 px-3 py-2 text-center text-sm font-medium text-white hover:bg-brand-600"
+                className="mt-1 flex min-h-11 items-center justify-center rounded-lg bg-brand-500 px-3 py-2 text-center text-sm font-medium text-white hover:bg-brand-600"
               >
                 Bejelentkezés
               </Link>
@@ -126,12 +126,12 @@ export default function SiteLayout({
               <ul className="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
                 <li>Jászberény, Fő tér 1.</li>
                 <li>
-                  <a href="mailto:info@dfse.hu" className="hover:text-brand-500">
+                  <a href="mailto:info@dfse.hu" className="inline-flex min-h-11 items-center hover:text-brand-500">
                     info@dfse.hu
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+36301234567" className="hover:text-brand-500">
+                  <a href="tel:+36301234567" className="inline-flex min-h-11 items-center hover:text-brand-500">
                     +36 30 123 4567
                   </a>
                 </li>
@@ -144,13 +144,13 @@ export default function SiteLayout({
               <ul className="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
                 {navLinks.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="hover:text-brand-500">
+                    <Link href={link.href} className="inline-flex min-h-11 items-center hover:text-brand-500">
                       {link.name}
                     </Link>
                   </li>
                 ))}
                 <li>
-                  <Link href="/signin" className="hover:text-brand-500">
+                  <Link href="/signin" className="inline-flex min-h-11 items-center hover:text-brand-500">
                     Belépés tagoknak
                   </Link>
                 </li>

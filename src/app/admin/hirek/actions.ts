@@ -71,7 +71,7 @@ async function removeImages(
 }
 
 export async function createNews(input: NewsInput): Promise<ActionResult<{ id: string }>> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("news.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateNews(input);
   if (validationError) return fail(validationError);
@@ -98,7 +98,7 @@ export async function createNews(input: NewsInput): Promise<ActionResult<{ id: s
 }
 
 export async function updateNews(id: string, input: NewsInput): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("news.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
   const validationError = validateNews(input);
   if (validationError) return fail(validationError);
@@ -139,7 +139,7 @@ export async function updateNews(id: string, input: NewsInput): Promise<ActionRe
 }
 
 export async function deleteNews(id: string): Promise<ActionResult> {
-  const { supabase, user, error } = await requireStaff();
+  const { supabase, user, error } = await requireStaff("news.manage");
   if (error || !user) return fail(error ?? "Ismeretlen hiba.");
 
   const { data: before } = await supabase

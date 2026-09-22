@@ -47,7 +47,7 @@ export default function SignInForm() {
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
         <Link
           href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+          className="inline-flex min-h-11 items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <ChevronLeftIcon />
           Vissza a főoldalra
@@ -93,16 +93,18 @@ export default function SignInForm() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <span
+                    <button
+                      type="button"
+                      aria-label={showPassword ? "Jelszó elrejtése" : "Jelszó megjelenítése"}
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                      className="absolute right-1 top-1/2 z-30 flex h-11 w-11 -translate-y-1/2 items-center justify-center"
                     >
                       {showPassword ? (
                         <EyeIcon className="fill-gray-500 dark:fill-gray-400" />
                       ) : (
                         <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400" />
                       )}
-                    </span>
+                    </button>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
@@ -114,7 +116,7 @@ export default function SignInForm() {
                   </div>
                   <Link
                     href="/reset-password"
-                    className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                    className="inline-flex min-h-11 items-center text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Elfelejtett jelszó?
                   </Link>

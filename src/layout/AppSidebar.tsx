@@ -4,14 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
+import { createClient } from "@/lib/supabase/client";
+import { PERMISSION_CODES, permissionForPath, type PermissionCode } from "@/lib/permissions";
 import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
   DocsIcon,
+  DollarLineIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
+  LockIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
@@ -26,7 +30,8 @@ type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  permission?: PermissionCode;
+  subItems?: { name: string; path: string; pro?: boolean; new?: boolean; permission?: PermissionCode }[];
 };
 
 const navItems: NavItem[] = [
@@ -34,41 +39,61 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     name: "Vezérlőpult",
     path: "/admin",
+    permission: "dashboard.view",
   },
   {
     icon: <CalenderIcon />,
     name: "Beosztás",
     path: "/admin/beosztas",
+    permission: "schedule.view",
   },
   {
     icon: <TaskIcon />,
     name: "Versenyek",
     path: "/admin/versenyek",
+    permission: "competitions.manage",
   },
   {
     icon: <ShootingStarIcon />,
     name: "Koreográfiák",
     path: "/admin/koreok",
+    permission: "choreographies.manage",
   },
   {
     icon: <TableIcon />,
     name: "Tagok",
     path: "/admin/tagok",
+    permission: "members.view",
+  },
+  {
+    icon: <DollarLineIcon />,
+    name: "Befizetések",
+    path: "/admin/befizetesek",
+    permission: "payments.view",
+  },
+  {
+    icon: <LockIcon />,
+    name: "Jogosultságok",
+    path: "/admin/jogosultsagok",
+    permission: "permissions.manage",
   },
   {
     icon: <DocsIcon />,
     name: "Hírek",
     path: "/admin/hirek",
+    permission: "news.manage",
   },
   {
     icon: <ListIcon />,
     name: "Naptár (események)",
     path: "/admin/calendar",
+    permission: "calendar.view",
   },
   {
     icon: <UserCircleIcon />,
     name: "Profilom",
     path: "/admin/profile",
+    permission: "profile.view",
   },
 ];
 
@@ -76,14 +101,16 @@ const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Statisztikák",
+    permission: "statistics.view",
     subItems: [
-      { name: "Vonaldiagram", path: "/admin/line-chart", pro: false },
-      { name: "Oszlopdiagram", path: "/admin/bar-chart", pro: false },
+      { name: "Vonaldiagram", path: "/admin/line-chart", pro: false, permission: "statistics.view" },
+      { name: "Oszlopdiagram", path: "/admin/bar-chart", pro: false, permission: "statistics.view" },
     ],
   },
   {
     icon: <BoxCubeIcon />,
     name: "Felület elemek",
+    permission: "ui.view",
     subItems: [
       { name: "Riasztások", path: "/admin/alerts", pro: false },
       { name: "Avatar", path: "/admin/avatars", pro: false },
@@ -97,6 +124,7 @@ const othersItems: NavItem[] = [
   {
     name: "Egyéb oldalak",
     icon: <PageIcon />,
+    permission: "other-pages.view",
     subItems: [
       { name: "Üres oldal", path: "/admin/blank", pro: false },
       { name: "404 hiba", path: "/error-404", pro: false },
@@ -112,13 +140,45 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const [allowedPermissions, setAllowedPermissions] = useState<Set<string> | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setAllowedPermissions(new Set());
+        return;
+      }
+      const adminResult = await supabase.rpc("is_admin");
+      const roleResult = !adminResult.data
+        ? await supabase.rpc("has_role", { _role: "admin" })
+        : { data: true, error: null };
+      if ((!adminResult.error && adminResult.data) || (!roleResult.error && roleResult.data)) {
+        setAllowedPermissions(new Set(["*"]));
+        return;
+      }
+      const results = await Promise.all(PERMISSION_CODES.map(async (code) => {
+        const result = await supabase.rpc("has_permission", { _code: code });
+        return result.data === true ? code : null;
+      }));
+      setAllowedPermissions(new Set(results.filter((code): code is PermissionCode => code !== null)));
+    })();
+  }, []);
+
+  const canAccess = useCallback((permission?: PermissionCode) => {
+    if (!permission) return true;
+    return allowedPermissions?.has("*") === true || allowedPermissions?.has(permission) === true;
+  }, [allowedPermissions]);
 
   const renderMenuItems = (
     navItems: NavItem[],
     menuType: "main" | "others"
   ) => (
     <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
+      {navItems.map((nav, index) => {
+        if (!canAccess(nav.permission)) return null;
+        return (
         <li key={nav.name}>
           {nav.subItems ? (
             <button
@@ -193,7 +253,7 @@ const AppSidebar: React.FC = () => {
               }}
             >
               <ul className="mt-2 space-y-1 ml-9">
-                {nav.subItems.map((subItem) => (
+                {nav.subItems.filter((subItem) => canAccess(subItem.permission ?? permissionForPath(subItem.path) ?? undefined)).map((subItem) => (
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
@@ -235,7 +295,8 @@ const AppSidebar: React.FC = () => {
             </div>
           )}
         </li>
-      ))}
+        );
+      })}
     </ul>
   );
 
@@ -312,7 +373,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex h-[calc(100vh-4rem)] flex-col lg:mt-0 lg:h-screen top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"

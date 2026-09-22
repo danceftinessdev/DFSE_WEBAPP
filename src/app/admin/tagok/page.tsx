@@ -1,5 +1,6 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import { createClient } from "@/lib/supabase/server";
+import { hasPermission } from "@/lib/supabase/guards";
 import { Metadata } from "next";
 import React from "react";
 import MemberManager, { MemberListItem, PaymentExportRow } from "./MemberManager";
@@ -13,6 +14,8 @@ export const dynamic = "force-dynamic";
 
 export default async function MembersPage() {
   const supabase = await createClient();
+  const canViewPayments = await hasPermission(supabase, "payments.view");
+  const canManagePayments = await hasPermission(supabase, "payments.manage");
 
   const [membersRes, groupsRes, unpaidPaymentsRes, unpaidCompRes, allPaymentsRes, allCompPaymentsRes] =
     await Promise.all([
@@ -24,20 +27,28 @@ export default async function MembersPage() {
         )
         .order("full_name"),
       supabase.from("groups").select("id, name").eq("is_active", true).order("name"),
-      supabase.from("member_payments").select("member_id").eq("is_paid", false),
-      supabase
+      canViewPayments
+        ? supabase.from("member_payments").select("member_id").eq("is_paid", false)
+        : Promise.resolve({ data: [] as { member_id: string }[] }),
+      canViewPayments
+        ? supabase
         .from("competition_payments")
-        .select("member_id, entry_fee_amount, entry_fee_paid, travel_fee_amount, travel_fee_paid"),
-      supabase
+        .select("member_id, entry_fee_amount, entry_fee_paid, travel_fee_amount, travel_fee_paid")
+        : Promise.resolve({ data: [] as { member_id: string; entry_fee_amount: number; entry_fee_paid: boolean; travel_fee_amount: number; travel_fee_paid: boolean }[] }),
+      canViewPayments
+        ? supabase
         .from("member_payments")
         .select("member_id, title, amount, due_date, is_paid, paid_at, members ( full_name )")
-        .order("due_date", { ascending: false }),
-      supabase
+        .order("due_date", { ascending: false })
+        : Promise.resolve({ data: [] as never[] }),
+      canViewPayments
+        ? supabase
         .from("competition_payments")
         .select(
           `member_id, entry_fee_amount, entry_fee_paid, travel_fee_amount, travel_fee_paid,
            members ( full_name ), competitions ( name, starts_at )`
-        ),
+        )
+        : Promise.resolve({ data: [] as never[] }),
     ]);
 
   const debtCounts = new Map<string, number>();
@@ -117,7 +128,9 @@ export default async function MembersPage() {
       <MemberManager
         members={members}
         groups={(groupsRes.data ?? []).map((g) => ({ id: g.id, name: g.name }))}
-        exportRows={exportRows}
+        exportRows={canViewPayments ? exportRows : []}
+        canViewPayments={canViewPayments}
+        canManagePayments={canManagePayments}
       />
     </div>
   );
