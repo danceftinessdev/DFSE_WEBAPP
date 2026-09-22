@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/database.types";
+import type { ExtendedDatabase } from "@/types/database.coach.types";
 
 /**
  * Supabase client for use in Server Components, Server Actions and Route Handlers.
@@ -9,7 +9,7 @@ import type { Database } from "@/types/database.types";
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient<Database>(
+  return createServerClient<ExtendedDatabase>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

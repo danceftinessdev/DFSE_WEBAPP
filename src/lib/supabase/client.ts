@@ -1,11 +1,11 @@
 import { createBrowserClient } from "@supabase/ssr";
-import type { Database } from "@/types/database.types";
+import type { ExtendedDatabase } from "@/types/database.coach.types";
 
 /**
  * Supabase client for use in Client Components ("use client").
  */
 export function createClient() {
-  return createBrowserClient<Database>(
+  return createBrowserClient<ExtendedDatabase>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );

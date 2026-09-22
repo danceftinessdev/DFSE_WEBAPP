@@ -99,6 +99,7 @@ const Calendar: React.FC = () => {
     } else {
       // Add new event
       const newEvent: CalendarEvent = {
+        // eslint-disable-next-line react-hooks/purity -- eseménykezelőben fut, nem render közben
         id: Date.now().toString(),
         title: eventTitle,
         start: eventStartDate,

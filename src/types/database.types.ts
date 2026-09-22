@@ -258,31 +258,46 @@ export type Database = {
         Row: {
           category_id: string | null
           competition_id: string | null
+          costume: string | null
           created_at: string
           duration_seconds: number | null
           id: string
           is_active: boolean
+          music_url: string | null
           name: string
+          note: string | null
+          target_group: string | null
+          type: string
           updated_at: string
         }
         Insert: {
           category_id?: string | null
           competition_id?: string | null
+          costume?: string | null
           created_at?: string
           duration_seconds?: number | null
           id?: string
           is_active?: boolean
+          music_url?: string | null
           name: string
+          note?: string | null
+          target_group?: string | null
+          type?: string
           updated_at?: string
         }
         Update: {
           category_id?: string | null
           competition_id?: string | null
+          costume?: string | null
           created_at?: string
           duration_seconds?: number | null
           id?: string
           is_active?: boolean
+          music_url?: string | null
           name?: string
+          note?: string | null
+          target_group?: string | null
+          type?: string
           updated_at?: string
         }
         Relationships: [
@@ -338,6 +353,42 @@ export type Database = {
           },
         ]
       }
+      choreography_dancers: {
+        Row: {
+          choreography_id: string
+          created_at: string
+          id: string
+          member_id: string
+        }
+        Insert: {
+          choreography_id: string
+          created_at?: string
+          id?: string
+          member_id: string
+        }
+        Update: {
+          choreography_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "choreography_dancers_choreography_id_fkey"
+            columns: ["choreography_id"]
+            isOneToOne: false
+            referencedRelation: "choreographies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "choreography_dancers_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       choreography_elements: {
         Row: {
           choreography_id: string
@@ -377,6 +428,122 @@ export type Database = {
           },
         ]
       }
+      choreography_parts: {
+        Row: {
+          choreography_id: string
+          created_at: string
+          id: string
+          name: string
+          points: number
+          sort_order: number
+        }
+        Insert: {
+          choreography_id: string
+          created_at?: string
+          id?: string
+          name: string
+          points?: number
+          sort_order?: number
+        }
+        Update: {
+          choreography_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          points?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "choreography_parts_choreography_id_fkey"
+            columns: ["choreography_id"]
+            isOneToOne: false
+            referencedRelation: "choreographies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_attendance: {
+        Row: {
+          class_id: string
+          created_at: string
+          guest_name: string | null
+          id: string
+          member_id: string | null
+          session_date: string
+          status: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          guest_name?: string | null
+          id?: string
+          member_id?: string | null
+          session_date: string
+          status?: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          guest_name?: string | null
+          id?: string
+          member_id?: string | null
+          session_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_attendance_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "training_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_attendance_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_enrollments: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          member_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          member_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_enrollments_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "training_classes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_enrollments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       class_types: {
         Row: {
           color: string | null
@@ -409,6 +576,69 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      competition_entries: {
+        Row: {
+          choreography_id: string | null
+          competition_id: string
+          created_at: string
+          entry_fee: number
+          entry_note: string | null
+          id: string
+          temp_category: string | null
+          temp_costume: string | null
+          temp_dancers: Json
+          temp_elements: Json
+          temp_music_url: string | null
+          temp_name: string | null
+          temp_type: string | null
+        }
+        Insert: {
+          choreography_id?: string | null
+          competition_id: string
+          created_at?: string
+          entry_fee?: number
+          entry_note?: string | null
+          id?: string
+          temp_category?: string | null
+          temp_costume?: string | null
+          temp_dancers?: Json
+          temp_elements?: Json
+          temp_music_url?: string | null
+          temp_name?: string | null
+          temp_type?: string | null
+        }
+        Update: {
+          choreography_id?: string | null
+          competition_id?: string
+          created_at?: string
+          entry_fee?: number
+          entry_note?: string | null
+          id?: string
+          temp_category?: string | null
+          temp_costume?: string | null
+          temp_dancers?: Json
+          temp_elements?: Json
+          temp_music_url?: string | null
+          temp_name?: string | null
+          temp_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_entries_choreography_id_fkey"
+            columns: ["choreography_id"]
+            isOneToOne: false
+            referencedRelation: "choreographies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_entries_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       competition_participants: {
         Row: {
@@ -467,38 +697,119 @@ export type Database = {
           },
         ]
       }
+      competition_payments: {
+        Row: {
+          competition_id: string
+          created_at: string
+          entry_fee_amount: number
+          entry_fee_note: string | null
+          entry_fee_paid: boolean
+          id: string
+          member_id: string
+          travel_fee_amount: number
+          travel_fee_note: string | null
+          travel_fee_paid: boolean
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          entry_fee_amount?: number
+          entry_fee_note?: string | null
+          entry_fee_paid?: boolean
+          id?: string
+          member_id: string
+          travel_fee_amount?: number
+          travel_fee_note?: string | null
+          travel_fee_paid?: boolean
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          entry_fee_amount?: number
+          entry_fee_note?: string | null
+          entry_fee_paid?: boolean
+          id?: string
+          member_id?: string
+          travel_fee_amount?: number
+          travel_fee_note?: string | null
+          travel_fee_paid?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_payments_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competitions: {
         Row: {
+          accommodation_address: string | null
+          accommodation_note: string | null
+          accommodation_price: number | null
+          check_in_time: string | null
+          check_out_time: string | null
           created_at: string
+          departure_location: string | null
+          departure_time: string | null
           description: string | null
           ends_at: string | null
           id: string
           is_active: boolean
+          is_public: boolean
           location: string | null
           name: string
           starts_at: string
+          type: string | null
           updated_at: string
         }
         Insert: {
+          accommodation_address?: string | null
+          accommodation_note?: string | null
+          accommodation_price?: number | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           created_at?: string
+          departure_location?: string | null
+          departure_time?: string | null
           description?: string | null
           ends_at?: string | null
           id?: string
           is_active?: boolean
+          is_public?: boolean
           location?: string | null
           name: string
           starts_at: string
+          type?: string | null
           updated_at?: string
         }
         Update: {
+          accommodation_address?: string | null
+          accommodation_note?: string | null
+          accommodation_price?: number | null
+          check_in_time?: string | null
+          check_out_time?: string | null
           created_at?: string
+          departure_location?: string | null
+          departure_time?: string | null
           description?: string | null
           ends_at?: string | null
           id?: string
           is_active?: boolean
+          is_public?: boolean
           location?: string | null
           name?: string
           starts_at?: string
+          type?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -783,6 +1094,47 @@ export type Database = {
         }
         Relationships: []
       }
+      member_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          due_date: string
+          id: string
+          is_paid: boolean
+          member_id: string
+          paid_at: string | null
+          title: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          is_paid?: boolean
+          member_id: string
+          paid_at?: string | null
+          title: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          due_date?: string
+          id?: string
+          is_paid?: boolean
+          member_id?: string
+          paid_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_payments_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           address: string | null
@@ -795,6 +1147,8 @@ export type Database = {
           guardian_name: string | null
           guardian_phone: string | null
           id: string
+          license_expiry: string | null
+          medical_expiry: string | null
           notes: string | null
           phone: string | null
           photo_url: string | null
@@ -811,6 +1165,8 @@ export type Database = {
           guardian_name?: string | null
           guardian_phone?: string | null
           id?: string
+          license_expiry?: string | null
+          medical_expiry?: string | null
           notes?: string | null
           phone?: string | null
           photo_url?: string | null
@@ -827,6 +1183,8 @@ export type Database = {
           guardian_name?: string | null
           guardian_phone?: string | null
           id?: string
+          license_expiry?: string | null
+          medical_expiry?: string | null
           notes?: string | null
           phone?: string | null
           photo_url?: string | null
@@ -888,8 +1246,10 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
+          gallery_urls: Json
           id: string
           is_active: boolean
+          is_prior: boolean
           is_published: boolean
           published_at: string | null
           slug: string
@@ -902,8 +1262,10 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          gallery_urls?: Json
           id?: string
           is_active?: boolean
+          is_prior?: boolean
           is_published?: boolean
           published_at?: string | null
           slug: string
@@ -916,8 +1278,10 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          gallery_urls?: Json
           id?: string
           is_active?: boolean
+          is_prior?: boolean
           is_published?: boolean
           published_at?: string | null
           slug?: string
@@ -1171,6 +1535,150 @@ export type Database = {
             columns: ["coach_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_status: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          note: string | null
+          override_coach: string | null
+          override_end_time: string | null
+          override_location: string | null
+          override_start_time: string | null
+          session_date: string
+          status: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          override_coach?: string | null
+          override_end_time?: string | null
+          override_location?: string | null
+          override_start_time?: string | null
+          session_date: string
+          status?: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          override_coach?: string | null
+          override_end_time?: string | null
+          override_location?: string | null
+          override_start_time?: string | null
+          session_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_status_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "training_classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_classes: {
+        Row: {
+          class_type: string
+          coach_name: string | null
+          created_at: string
+          day_of_week: number | null
+          description: string | null
+          end_time: string
+          group_id: string | null
+          id: string
+          is_active: boolean
+          location: string | null
+          name: string
+          specific_date: string | null
+          start_time: string
+        }
+        Insert: {
+          class_type?: string
+          coach_name?: string | null
+          created_at?: string
+          day_of_week?: number | null
+          description?: string | null
+          end_time: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          name: string
+          specific_date?: string | null
+          start_time: string
+        }
+        Update: {
+          class_type?: string
+          coach_name?: string | null
+          created_at?: string
+          day_of_week?: number | null
+          description?: string | null
+          end_time?: string
+          group_id?: string | null
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          name?: string
+          specific_date?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_classes_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      travel_vehicles: {
+        Row: {
+          capacity: number
+          competition_id: string
+          created_at: string
+          driver_name: string | null
+          id: string
+          note: string | null
+          passengers: Json
+          type: string
+        }
+        Insert: {
+          capacity?: number
+          competition_id: string
+          created_at?: string
+          driver_name?: string | null
+          id?: string
+          note?: string | null
+          passengers?: Json
+          type?: string
+        }
+        Update: {
+          capacity?: number
+          competition_id?: string
+          created_at?: string
+          driver_name?: string | null
+          id?: string
+          note?: string | null
+          passengers?: Json
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_vehicles_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
             referencedColumns: ["id"]
           },
         ]

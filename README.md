@@ -34,7 +34,7 @@ npm run lint    # ESLint ellenőrzés
 ```
 src/app/(site)/        Nyilvános oldalak (főoldal, bemutatkozás, kapcsolat)
 src/app/admin/         Admin irányítópult (tagok, órarend, statisztikák, profil...)
-src/app/(full-width-pages)/  Bejelentkezés / regisztráció / hibaoldalak
+src/app/(full-width-pages)/  Bejelentkezés / hibaoldalak
 src/components/        Újrafelhasználható UI komponensek
 src/layout/             Admin oldalsáv és fejléc
 ```
@@ -44,8 +44,9 @@ src/layout/             Admin oldalsáv és fejléc
 Ez a projekt jelenleg egy admin dashboard **sablon** (TailAdmin) alapján készült, kitöltve a DFSE
 egyesületre szabott mintaadatokkal és szöveggel. Éles bevezetés előtt szükséges:
 
-* **Valódi bejelentkezés/jogosultságkezelés** bekötése – jelenleg a `/signin` és `/signup` oldalak
-  csak vizuális demók, nincs mögöttük működő azonosítás, így az `/admin` útvonalak nincsenek védve.
+* **Valódi bejelentkezés/jogosultságkezelés** bekötése – jelenleg a `/signin` oldal csak vizuális
+  demó, nincs mögötte működő azonosítás, így az `/admin` útvonalak nincsenek védve. Nyilvános
+  regisztráció nincs, felhasználót csak admin/edző hozhat létre (pl. Supabase Studio-ban).
 * **Adatbázis** bekötése a tagok, csoportok, órarend és tagdíjak valós kezeléséhez (a táblázatok és
   grafikonok most minta adatokat mutatnak).
 * A `/kapcsolat` oldalon és a lábléceken szereplő elérhetőségek (cím, telefon, e-mail) lecserélése a

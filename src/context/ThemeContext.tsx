@@ -23,8 +23,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const initialTheme = savedTheme || "light"; // Default to light theme
 
+    /* eslint-disable react-hooks/set-state-in-effect -- a mentett téma csak mount után olvasható localStorage-ból (hydration mismatch elkerülése) */
     setTheme(initialTheme);
     setIsInitialized(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   useEffect(() => {

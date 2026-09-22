@@ -8,13 +8,16 @@ import {
   BoxCubeIcon,
   CalenderIcon,
   ChevronDownIcon,
+  DocsIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
+  ShootingStarIcon,
   TableIcon,
+  TaskIcon,
   UserCircleIcon,
 } from "../icons/index";
 import SidebarWidget from "./SidebarWidget";
@@ -34,18 +37,33 @@ const navItems: NavItem[] = [
   },
   {
     icon: <CalenderIcon />,
-    name: "Órarend",
-    path: "/admin/calendar",
+    name: "Beosztás",
+    path: "/admin/beosztas",
+  },
+  {
+    icon: <TaskIcon />,
+    name: "Versenyek",
+    path: "/admin/versenyek",
+  },
+  {
+    icon: <ShootingStarIcon />,
+    name: "Koreográfiák",
+    path: "/admin/koreok",
   },
   {
     icon: <TableIcon />,
     name: "Tagok",
-    path: "/admin/basic-tables",
+    path: "/admin/tagok",
+  },
+  {
+    icon: <DocsIcon />,
+    name: "Hírek",
+    path: "/admin/hirek",
   },
   {
     icon: <ListIcon />,
-    name: "Új tag felvétele",
-    path: "/admin/form-elements",
+    name: "Naptár (események)",
+    path: "/admin/calendar",
   },
   {
     icon: <UserCircleIcon />,
@@ -86,11 +104,8 @@ const othersItems: NavItem[] = [
   },
   {
     icon: <PlugInIcon />,
-    name: "Belépés",
-    subItems: [
-      { name: "Bejelentkezés", path: "/signin", pro: false },
-      { name: "Regisztráció", path: "/signup", pro: false },
-    ],
+    name: "Bejelentkezés",
+    path: "/signin",
   },
 ];
 
@@ -224,43 +239,50 @@ const AppSidebar: React.FC = () => {
     </ul>
   );
 
+  const findMatchingSubmenu = useCallback(
+    (path: string): { type: "main" | "others"; index: number } | null => {
+      for (const menuType of ["main", "others"] as const) {
+        const items = menuType === "main" ? navItems : othersItems;
+        for (let index = 0; index < items.length; index++) {
+          const nav = items[index];
+          if (
+            nav.subItems?.some(
+              (subItem) =>
+                path === subItem.path ||
+                (subItem.path !== "/admin" && path.startsWith(`${subItem.path}/`))
+            )
+          ) {
+            return { type: menuType, index };
+          }
+        }
+      }
+      return null;
+    },
+    []
+  );
+
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
     index: number;
-  } | null>(null);
+  } | null>(() => findMatchingSubmenu(pathname));
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
     {}
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  // Pontos egyezés, illetve prefix-egyezés az aloldalakhoz (pl. /admin/tagok/[id])
+  const isActive = useCallback(
+    (path: string) => path === pathname || (path !== "/admin" && pathname.startsWith(`${path}/`)),
+    [pathname]
+  );
 
-  useEffect(() => {
-    // Check if the current path matches any submenu item
-    let submenuMatched = false;
-    ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
-      items.forEach((nav, index) => {
-        if (nav.subItems) {
-          nav.subItems.forEach((subItem) => {
-            if (isActive(subItem.path)) {
-              setOpenSubmenu({
-                type: menuType as "main" | "others",
-                index,
-              });
-              submenuMatched = true;
-            }
-          });
-        }
-      });
-    });
-
-    // If no submenu item matches, close the open submenu
-    if (!submenuMatched) {
-      setOpenSubmenu(null);
-    }
-  }, [pathname,isActive]);
+  // Útváltáskor a megfelelő almenü megnyitása / bezárása
+  // (render közbeni állapotkorrekció – csak útváltáskor fut)
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (lastPathname !== pathname) {
+    setLastPathname(pathname);
+    setOpenSubmenu(findMatchingSubmenu(pathname));
+  }
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
