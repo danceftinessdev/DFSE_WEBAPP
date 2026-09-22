@@ -10,10 +10,11 @@ import { createMember } from "../actions";
 
 interface NewMemberFormProps {
   groups: { id: string; name: string }[];
+  profiles: { id: string; display_name: string | null; email: string }[];
 }
 
 /** Új tag felvételi űrlap (önálló oldal, nem popup). */
-export default function NewMemberForm({ groups }: NewMemberFormProps) {
+export default function NewMemberForm({ groups, profiles }: NewMemberFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ variant: "success" | "error"; message: string } | null>(null);
@@ -41,7 +42,7 @@ export default function NewMemberForm({ groups }: NewMemberFormProps) {
       {feedback && <Alert variant={feedback.variant} title="Hiba" message={feedback.message} />}
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-        <MemberForm value={form} onChange={setForm} disabled={isPending} />
+        <MemberForm value={form} onChange={setForm} profiles={profiles} disabled={isPending} />
         {groups.length > 0 && (
           <div className="mt-4">
             <Label>Csoportbeosztás</Label>

@@ -1151,6 +1151,7 @@ export type Database = {
           medical_expiry: string | null
           notes: string | null
           phone: string | null
+          profile_id: string | null
           photo_url: string | null
           status: string
         }
@@ -1169,6 +1170,7 @@ export type Database = {
           medical_expiry?: string | null
           notes?: string | null
           phone?: string | null
+          profile_id?: string | null
           photo_url?: string | null
           status?: string
         }
@@ -1187,6 +1189,7 @@ export type Database = {
           medical_expiry?: string | null
           notes?: string | null
           phone?: string | null
+          profile_id?: string | null
           photo_url?: string | null
           status?: string
         }

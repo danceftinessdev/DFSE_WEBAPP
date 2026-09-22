@@ -36,6 +36,11 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
+    icon: <UserCircleIcon />,
+    name: "Saját területem",
+    path: "/admin/sajat-terulet",
+  },
+  {
     icon: <GridIcon />,
     name: "Vezérlőpult",
     path: "/admin",

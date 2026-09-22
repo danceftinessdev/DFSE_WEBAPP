@@ -57,6 +57,7 @@ export interface MemberCompetitionItem {
 interface MemberDetailProps {
   member: Member;
   groups: { id: string; name: string }[];
+  profiles: { id: string; display_name: string | null; email: string }[];
   initialGroupIds: string[];
   payments: MemberPayment[];
   compPayments: MemberCompPaymentItem[];
@@ -80,6 +81,7 @@ type TabId = (typeof TABS)[number]["id"];
 export default function MemberDetail({
   member,
   groups,
+  profiles,
   initialGroupIds,
   payments,
   compPayments,
@@ -95,6 +97,7 @@ export default function MemberDetail({
   const [feedback, setFeedback] = useState<{ variant: "success" | "error"; message: string } | null>(null);
 
   const [form, setForm] = useState<MemberInput>({
+    profile_id: member.profile_id,
     full_name: member.full_name,
     birth_date: member.birth_date,
     gender: member.gender,
@@ -221,7 +224,7 @@ export default function MemberDetail({
       {/* Adatok */}
       {activeTab === "adatok" && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-          <MemberForm value={form} onChange={setForm} disabled={isPending || !canManageMembers} />
+          <MemberForm value={form} onChange={setForm} profiles={profiles} disabled={isPending || !canManageMembers} />
           {groups.length > 0 && (
             <div className="mt-4">
               <Label>Csoportbeosztás</Label>

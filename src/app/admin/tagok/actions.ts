@@ -5,6 +5,7 @@ import { requireStaff, ok, fail, type ActionResult } from "@/lib/supabase/guards
 import { logAudit } from "@/lib/audit";
 
 export interface MemberInput {
+  profile_id?: string | null;
   full_name: string;
   birth_date?: string | null;
   gender?: string | null;
@@ -24,6 +25,7 @@ const MEMBER_STATUSES = ["active", "pending", "inactive"] as const;
 
 function normalize(input: MemberInput) {
   return {
+    profile_id: input.profile_id || null,
     full_name: input.full_name.trim(),
     birth_date: input.birth_date || null,
     gender: input.gender || null,

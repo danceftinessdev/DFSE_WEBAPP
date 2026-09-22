@@ -8,6 +8,7 @@ import TextArea from "@/components/form/input/TextArea";
 import Label from "@/components/form/Label";
 import Checkbox from "@/components/form/input/Checkbox";
 import Alert from "@/components/ui/alert/Alert";
+import Badge from "@/components/ui/badge/Badge";
 import { Modal } from "@/components/ui/modal";
 import {
   createAnnouncement,
@@ -158,18 +159,16 @@ export default function AnnouncementManager({
           >
             <div>
               <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-600">
+                <Badge variant="light" color="primary" size="sm">
                   {item.display_mode === "login"
                     ? "Belépésenként"
                     : item.display_mode === "all_pages"
                       ? "Minden oldalon"
                       : "Kiválasztott oldalakon"}
-                </span>
-                <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${item.is_active ? "bg-success-50 text-success-600" : "bg-gray-100 text-gray-500"}`}
-                >
+                </Badge>
+                <Badge variant="light" color={item.is_active ? "success" : "light"} size="sm">
                   {item.is_active ? "Aktív" : "Inaktív"}
-                </span>
+                </Badge>
               </div>
               <h3 className="mt-2 font-semibold text-gray-800 dark:text-white/90">
                 {item.title}
@@ -282,7 +281,7 @@ export default function AnnouncementManager({
                         }
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {page.label} <span className="text-xs text-gray-400">{page.path}</span>
+                        {page.label} <span className="text-xs text-gray-400 dark:text-gray-500">{page.path}</span>
                       </span>
                     </div>
                   ))}

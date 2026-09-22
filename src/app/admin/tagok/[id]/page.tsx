@@ -30,9 +30,10 @@ export default async function MemberDetailPage({ params }: Props) {
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
   const since = ninetyDaysAgo.toISOString().slice(0, 10);
 
-  const [groupsRes, enrollmentsRes, paymentsRes, compPaymentsRes, attendanceRes, choreoRes] =
+  const [groupsRes, profilesRes, enrollmentsRes, paymentsRes, compPaymentsRes, attendanceRes, choreoRes] =
     await Promise.all([
       supabase.from("groups").select("id, name").eq("is_active", true).order("name"),
+      supabase.from("profiles").select("id, display_name, email").eq("is_active", true).order("email"),
       supabase
         .from("enrollments")
         .select("id, group_id, status, fee_status, groups ( name )")
@@ -115,6 +116,7 @@ export default async function MemberDetailPage({ params }: Props) {
       <MemberDetail
         member={member as Member}
         groups={(groupsRes.data ?? []) as Pick<Group, "id" | "name">[]}
+        profiles={profilesRes.data ?? []}
         initialGroupIds={(enrollmentsRes.data ?? []).map((e) => e.group_id)}
         payments={(paymentsRes.data ?? []) as MemberPayment[]}
         compPayments={compPayments}

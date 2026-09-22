@@ -19,6 +19,7 @@ export const GENDER_OPTIONS = [
 ];
 
 export const emptyMemberInput: MemberInput = {
+  profile_id: null,
   full_name: "",
   birth_date: null,
   gender: null,
@@ -40,11 +41,12 @@ const selectClass =
 interface MemberFormProps {
   value: MemberInput;
   onChange: (next: MemberInput) => void;
+  profiles: { id: string; display_name: string | null; email: string }[];
   disabled?: boolean;
 }
 
 /** Tag űrlap – létrehozáshoz és szerkesztéshez is használható. */
-export default function MemberForm({ value, onChange, disabled }: MemberFormProps) {
+export default function MemberForm({ value, onChange, profiles, disabled }: MemberFormProps) {
   const set = <K extends keyof MemberInput>(key: K, v: MemberInput[K]) =>
     onChange({ ...value, [key]: v });
 
@@ -106,6 +108,23 @@ export default function MemberForm({ value, onChange, disabled }: MemberFormProp
           onChange={(e) => set("email", e.target.value || null)}
           disabled={disabled}
         />
+      </div>
+      <div className="sm:col-span-2">
+        <Label htmlFor="member-profile">Belépési profil</Label>
+        <select
+          id="member-profile"
+          className={selectClass}
+          value={value.profile_id ?? ""}
+          onChange={(e) => set("profile_id", e.target.value || null)}
+          disabled={disabled}
+        >
+          <option value="">Nincs hozzárendelve</option>
+          {profiles.map((profile) => (
+            <option key={profile.id} value={profile.id}>
+              {profile.display_name || profile.email}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <Label htmlFor="member-city">Település</Label>

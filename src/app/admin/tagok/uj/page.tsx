@@ -13,16 +13,15 @@ export const dynamic = "force-dynamic";
 
 export default async function NewMemberPage() {
   const supabase = await createClient();
-  const { data: groups } = await supabase
-    .from("groups")
-    .select("id, name")
-    .eq("is_active", true)
-    .order("name");
+  const [{ data: groups }, { data: profiles }] = await Promise.all([
+    supabase.from("groups").select("id, name").eq("is_active", true).order("name"),
+    supabase.from("profiles").select("id, display_name, email").eq("is_active", true).order("email"),
+  ]);
 
   return (
     <div>
       <PageBreadcrumb pageTitle="Új tag" />
-      <NewMemberForm groups={groups ?? []} />
+      <NewMemberForm groups={groups ?? []} profiles={profiles ?? []} />
     </div>
   );
 }
