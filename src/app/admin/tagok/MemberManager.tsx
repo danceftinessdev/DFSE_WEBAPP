@@ -8,6 +8,7 @@ import Alert from "@/components/ui/alert/Alert";
 import Input from "@/components/form/input/InputField";
 import Checkbox from "@/components/form/input/Checkbox";
 import Label from "@/components/form/Label";
+import { Modal } from "@/components/ui/modal";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import {
